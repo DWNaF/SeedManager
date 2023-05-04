@@ -3,9 +3,6 @@
 require_once "../config/config.php";
 require_once "../config/csrf.php";
 
-if (session_status() != PHP_SESSION_ACTIVE) {
-    session_start();
-}
 ob_start();
 
 if (!isset($_SESSION["logged"]) || $_SESSION["logged"] == false) {

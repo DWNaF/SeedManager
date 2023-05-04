@@ -6,16 +6,16 @@ class Seed
     public int $id;
     public string $name;
     public string $family;
-    public string $planting_period;
-    public string $harvest_period;
-    public string $advices;
-    public string $image;
-    public int $quantity;
+    public ?int $planting_period;
+    public ?int $harvest_period;
+    public ?string $advices;
+    public ?string $image;
+    public ?int $quantity;
 
 
-    // Constructeur
-    public function load(string $name, string $family, string $planting_period, string $harvest_period, string $advices, string $image, int $quantity)
+    public function load(int $id, string $name, string $family, ?int $planting_period, ?int $harvest_period, ?string $advices, ?string $image, ?int $quantity)
     {
+        $this->id = $id;
         $this->name = $name;
         $this->family = $family;
         $this->planting_period = $planting_period;
@@ -24,6 +24,8 @@ class Seed
         $this->image = $image;
         $this->quantity = $quantity;
     }
+
+
 
     // Getters
     public function getId(): int
@@ -38,23 +40,23 @@ class Seed
     {
         return $this->family;
     }
-    public function getPlantingPeriod(): string
+    public function getPlantingPeriod(): ?int
     {
         return $this->planting_period;
     }
-    public function getHarvestPeriod(): string
+    public function getHarvestPeriod(): ?int
     {
         return $this->harvest_period;
     }
-    public function getAdvices(): string
+    public function getAdvices(): ?string
     {
         return $this->advices;
     }
-    public function getImage(): string
+    public function getImage(): ?string
     {
         return $this->image;
     }
-    public function getQuantity(): int
+    public function getQuantity(): ?int
     {
         return $this->quantity;
     }

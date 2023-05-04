@@ -7,20 +7,22 @@ ob_start();
 <section id="main_content">
 
     <?php
-    $SeedsDB = new SeedDB();
-    $seeds = $SeedsDB->getAllSeeds();
-    $families = $SeedsDB->getAllFamilies();
+    if (isset($_GET["filters"])) {
+        $filters = $_GET["filters"];
+    } else {
+        $filters = null;
+    }
 
-    $selectedFamily = $_GET['family'] ?? null;
-    $searchQuery = $_GET['search'] ?? null;
+    Form::renderFilterForm($filters);
 
-    /**
-     * TODO : Submit le forme lorsqu'on change de famille dans le form
-     */
 
-    SeedRenderer::renderFilterForm($families, $searchQuery);
-    SeedRenderer::renderAll($seeds, $selectedFamily, $searchQuery);
+    if (isset($filters) && $filters != null) {
+        $seeds = SeedDB::getFilteredSeeds($filters);
+    } else {
+        $seeds = SeedDB::getAllSeeds();
+    }
 
+    SeedRenderer::renderAll($seeds);
     ?>
 </section>
 <?php

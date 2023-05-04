@@ -3,7 +3,6 @@
 require_once '../config/config.php';
 
 // On vérifie que l'utilisateur est connecté et qu'il a bien accès à cette page
-if (session_status() != PHP_SESSION_ACTIVE) session_start();
 if (!isset($_SESSION["logged"]) || $_SESSION["logged"] == false || !isset($_GET["id"])) {
     header("Location: " . PUBLIC_PATH . "error.php");
     exit();

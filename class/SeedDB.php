@@ -3,40 +3,108 @@
 class SeedDB
 {
     // Attribut(s)
-    private ?PDO $bd = null;
+    private static ?PDO $bd = null;
 
-    // Constructeur
-    public function __construct()
+    public static function connect()
     {
         Database::log();
-        $this->bd = Database::getDB();
+        self::$bd = Database::getDB();
+    }
+
+    public static function isConnected(): bool
+    {
+        return self::$bd != null;
     }
 
     /**
      * Récupère toutes les graines de la base de données
      * @return array|null Tableau contenant toutes les graines de la base de données sous forme d'instances de Seed
      */
-    public function getAllSeeds(): ?array
+    public static function getAllSeeds(): ?array
     {
-        if ($this->bd == null) return null;
-        $statement = $this->bd->prepare("SELECT * FROM seeds");
+        if (!self::isConnected()) {
+            self::connect();
+        };
+
+        // Construction de la requête SQL
+        $sql = "SELECT * FROM seeds";
+
+        // Exécution de la requête SQL
+        $statement = self::$bd->prepare($sql);
         if (!($statement->execute())) return null;
         $seeds = $statement->fetchAll(PDO::FETCH_CLASS, "Seed");
 
         return $seeds;
     }
 
+    /**
+     * Récupère toutes les graines de la base de données filtrées selon les critères spécifiés
+     * @param array|null $filters Tableau associatif contenant les critères de filtres et leurs valeurs
+     * @return array|null Tableau contenant toutes les graines de la base de données filtrées sous forme d'instances de Seed
+     */
+    public static function getFilteredSeeds(?array $filters): ?array
+    {
+        if (!self::isConnected()) {
+            self::connect();
+        };
+
+        // Construction de la requête SQL
+        $sql = "SELECT * FROM seeds WHERE 1=1";
+        $params = array();
+
+        if ($filters) {
+            if (isset($filters['name'])) {
+                $sql .= " AND name LIKE ?";
+                $params[] = '%' . $filters['name'] . '%';
+            }
+            if (isset($filters['family'])) {
+                $sql .= " AND family LIKE ?";
+                $params[] = '%' . $filters['family'] . '%';
+            }
+            if (isset($filters['planting_period'])) {
+                $sql .= " AND planting_period = ?";
+                $params[] = $filters['planting_period'];
+            }
+            if (isset($filters['harvest_period'])) {
+                $sql .= " AND harvest_period = ?";
+                $params[] = $filters['harvest_period'];
+            }
+            if (isset($filters['advices'])) {
+                $sql .= " AND advices LIKE ?";
+                $params[] = '%' . $filters['advices'] . '%';
+            }
+            if (isset($filters['image'])) {
+                $sql .= " AND image LIKE ?";
+                $params[] = '%' . $filters['image'] . '%';
+            }
+            if (isset($filters['quantity'])) {
+                $sql .= " AND quantity = ?";
+                $params[] = $filters['quantity'];
+            }
+        }
+
+        // Exécution de la requête SQL
+        $statement = self::$bd->prepare($sql);
+        if (!($statement->execute($params))) return null;
+        $seeds = $statement->fetchAll(PDO::FETCH_CLASS, "Seed");
+
+        return $seeds;
+    }
 
     /**
      * Récupère toutes les familles de graines de la base de données
      */
-    public function getAllFamilies(): ?array
+    public static function getAllFamilies(): ?array
     {
-        if ($this->bd == null) return null;
-        $statement = $this->bd->prepare("SELECT DISTINCT family FROM seeds");
+        Database::log();
+        $database = Database::getDB();
+
+        if ($database == null) return null;
+        $statement = $database->prepare("SELECT DISTINCT family FROM seeds");
         if (!($statement->execute())) return null;
         $families = $statement->fetchAll(PDO::FETCH_COLUMN);
 
+        Database::disconnect();
         return $families;
     }
 
@@ -46,13 +114,17 @@ class SeedDB
      * @param int $id L'identifiant de la graine à récupérer
      * @return Seed|null La graine récupérée, null si la graine n'existe pas
      */
-    public function getSeed(int $id): ?Seed
+    public static function getSeed(int $id): ?Seed
     {
-        if ($this->bd == null) return null;
-        $statement = $this->bd->prepare("SELECT * FROM seeds WHERE id = ?");
+        Database::log();
+        $database = Database::getDB();
+
+        if ($database == null) return null;
+        $statement = $database->prepare("SELECT * FROM seeds WHERE id = ?");
         if (!($statement->execute([$id]))) return null;
         $seed = $statement->fetchObject("Seed");
 
+        Database::disconnect();
         return $seed;
     }
 
@@ -61,10 +133,13 @@ class SeedDB
      * @param Seed $seed La graine à ajouter
      * @return bool True si l'ajout s'est bien déroulé, False sinon
      */
-    public function addSeed(Seed $seed): bool
+    public static function addSeed(Seed $seed): bool
     {
-        if ($this->bd == null) return false;
-        $statement = $this->bd->prepare("INSERT INTO seeds (name, family, planting_period, harvest_period, image, advices, quantity) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        if (!self::isConnected()) {
+            self::connect();
+        };
+
+        $statement = self::$bd->prepare("INSERT INTO seeds (name, family, planting_period, harvest_period, image, advices, quantity) VALUES (?, ?, ?, ?, ?, ?, ?)");
         $result = $statement->execute([$seed->getName(), $seed->getFamily(), $seed->getPlantingPeriod(), $seed->getHarvestPeriod(), $seed->getImage(), $seed->getAdvices(), $seed->getQuantity()]);
         return $result;
     }
@@ -74,10 +149,13 @@ class SeedDB
      * @param int $id L'identifiant de la graine à supprimer
      * @return bool True si la suppression s'est bien déroulée, False sinon
      */
-    public function deleteSeed(int $id): bool
+    public static function deleteSeed(int $id): bool
     {
-        if ($this->bd == null) return false;
-        $statement = $this->bd->prepare("DELETE FROM seeds WHERE id = ?");
+        if (!self::isConnected()) {
+            self::connect();
+        };
+
+        $statement = self::$bd->prepare("DELETE FROM seeds WHERE id = ?");
         $result = $statement->execute([$id]);
         return $result;
     }
@@ -88,31 +166,16 @@ class SeedDB
      * @param int $newQuantity Nouvelle quantité de la graine
      * @return bool True si la mise à jour a été effectuée avec succès, false sinon
      */
-    public function updateSeedQuantity(int $id, int $newQuantity): bool
+    public static function updateSeedQuantity(int $id, int $newQuantity): bool
     {
-        if ($this->bd == null) return false;
+        if (!self::isConnected()) {
+            self::connect();
+        };
 
-        $statement = $this->bd->prepare("UPDATE seeds SET quantity = :quantity WHERE id = :id");
+        $statement = self::$bd->prepare("UPDATE seeds SET quantity = :quantity WHERE id = :id");
         $statement->bindValue(':quantity', $newQuantity, PDO::PARAM_INT);
         $statement->bindValue(':id', $id, PDO::PARAM_INT);
 
         return $statement->execute();
-    }
-
-
-    /**
-     * Upload une image
-     * @param array $image Image à uploader
-     * @return string|null nom de l'image si l'upload a réussi, null sinon
-     */
-    public static function uploadImage($image): ?string
-    {
-        $dossier_cible = SEEDS_ASSETS_PATH_FULL;
-        $nom_fichier = $image['name'];
-        $chemin_fichier = $dossier_cible . $nom_fichier;
-        if (move_uploaded_file($image['tmp_name'], $chemin_fichier)) {
-            return $nom_fichier;
-        }
-        return null;
     }
 }

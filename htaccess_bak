@@ -1,0 +1,46 @@
+# Rediriger les requettes http vers https
+# RewriteCond %{HTTPS} off
+# RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R,L]
+
+# Désactiver l'indexation du répertoire
+Options -Indexes
+
+# Restreindre l'accès aux fichiers de configuration
+<FilesMatch "(config.php|.env)">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+
+RewriteEngine On
+RewriteBase /test_adexos/
+
+
+# Retire le .php des fichiers php du répertoire public
+RewriteCond %{REQUEST_METHOD} ^(HEAD|TRACE|DELETE|TRACK|DEBUG) [NC]
+RewriteRule ^.* - [F,L]
+
+RewriteCond %{THE_REQUEST} /public/([^.]+)\.php [NC]
+RewriteRule ^ %1 [R=301,L]
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^([^/]+)/?$ public/$1.php [L]
+
+
+# Retire le .php des fichiers php du répertoire public/handlers 
+RewriteCond %{THE_REQUEST} /public/handlers/([^.]+)\.php [NC]
+RewriteRule ^ %1 [R=301,L]
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^handlers/([^/]+)/?$ public/handlers/$1.php [L]
+
+# Redirection des erreurs 403 et 404 vers la page erreur
+ErrorDocument 403 /test_adexos/public/error.php
+ErrorDocument 404 /test_adexos/public/error.php
+
+<Files *.ini>
+    Order allow,deny
+    Deny from all
+</Files>

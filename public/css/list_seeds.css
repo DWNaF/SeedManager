@@ -1,0 +1,64 @@
+#main_content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+#filter_container{
+    position: relative;
+    margin: 30px 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+#seeds_container{
+    border-radius: 4px;
+
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    width: 80%;
+
+    margin-bottom: 70px;
+}
+
+.seed{
+    color: var(--color-paragraphs);
+    width: 600px;
+    border-radius: 6px;
+    padding: 10px;
+
+    /* width: 32%; */
+    background-color: var(--color-seeds-container-background);
+}
+
+#add_seed_btn{
+    background-color: var(--color-seeds-container-background);
+    color: var(--color-paragraphs) ;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.light_text{
+    color: var(--color-ligth-text);
+    font-weight: lighter;
+}
+
+.bold{
+    font-weight: bold;
+}
+
+.admin_buttons{
+    border-radius: 4px;
+    background-color: var(--color-navbar-background);
+    margin: 5px;
+    padding: 0 5px;
+}

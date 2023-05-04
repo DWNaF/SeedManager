@@ -1,0 +1,41 @@
+Voici donc le test.
+
+Avant tout, je tiens à préciser que je ne maîtrise pas encore bien symfony donc j'ai fait tout le projet sans framework, avec tout ce que j'ai appris en cours et de mon coté personnellement.
+
+L'arborescence est donc classique, il y'a un dossier config avec : 
+    - Un fichier config.php contenant plusieurs constantes définies pour faciliter le code.
+    - Un fichier login_db.ini contenant les informations de connexion à la base de données.
+    - Un fichier csrf.php permettant de générer un token csrf pour chaque formulaire.
+
+Il y'a le dossier class contenant toutes les classes nécéssaires.
+    - Autoloader : permets de charger automatiquement les classes.
+    - Database : permet de se connecter à la base de données.
+    - Logger : permet de générer les formulaires de login et de vérifier la connexion.
+    - Seed : permet de stocker une graine dans son propre type une fois qu'elle est récupérée depuis la BD.
+    - SeedDB : permets de gérer les requettes à la BD concernant les graines.
+    - SeedRenderer : permets de générer le rendu html concernant les graines.
+    - Template : permets de générer le rendu html basique des pages (un contenu entre le header et le footer).
+
+Il y'a le dossier public contenant les fichiers publics.
+    - css/assets : contient toutes les images.
+    - handlers : contient les handlers des formulaires.
+
+Je n'ai pas eu le temps de finir en quatre heures, j'ai donc fait le plus important, c'est à dire la partie affichage des graines, la partie ajout de graines et la partie connexion.
+Dans le dossier data vous pouvez trouver le fichier sql pour créer la base de données et les table nécéssaires.
+
+! IMPORTANT ! : Dans Logger, j'ai mis une fonction pour créer un utilisateur dans la base de données, vous pouvez donc créer un utilisateur de cette façon, ou bien vous pouve juste source mon export.sql pour avoir un utilisateur déjà créé.
+utilisateur du backup : admin
+mot de passe du backup : admin
+
+
+Ce qu'il reste : 
+    - édition des seeds. Cependant j'ai terminé la suppression et l'ajout et cela fonctionne parfaitement.
+    - Un peu plus de css.
+    - + de filtres de recherches
+    - Calendrier / todo list
+    - Export csv
+
+Mais j'ai essayé de faire un code flexible et facilement modifiable. 
+
+Sachez que quelque soit la décision, c'était un plaisir de bosser sur ce projet, et malgré le fait que je dois le rendre, je vais le terminer de mon coté et peut être même le mettre sur mon portfolio.
+D'ici ce week-end je l'aurai fini je pense et si vous voulez je pourrai vous montrer la version finale. 

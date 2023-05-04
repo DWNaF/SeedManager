@@ -1,0 +1,32 @@
+#log_form{
+    background-color: var(--color-login-fond);
+    width: 300px;
+    margin: 0 auto;
+    margin-top: 100px;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 2px #000;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#log_form input{
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #000;
+}
+
+#log_form input:focus{
+    outline: 0;
+}
+
+#log_form button {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--color-navbar-fond);
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+}

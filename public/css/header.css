@@ -1,0 +1,34 @@
+a {
+    text-decoration: none;
+    color: var(--color-navbar-text);
+}
+
+ul {
+    list-style: none;
+}
+
+nav{
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 70px;
+    width: 100%;
+
+    background-color: var(--color-navbar-background);
+}
+
+nav ul {
+    display: flex;
+    gap: 50px;
+}
+
+nav ul:first-child{
+    justify-self: flex-start;
+}
+
+.admin_btns{
+    position: absolute;
+    right: 15px;
+}

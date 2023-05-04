@@ -1,0 +1,15 @@
+main {
+    height: 90vh;
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items : center;
+
+    color: var(--color-paragraphs);
+}
+
+main a {
+    color: var(--color-links);
+}

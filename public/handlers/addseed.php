@@ -11,7 +11,7 @@ if (!isset($_SESSION["logged"]) || $_SESSION["logged"] == false) {
 // Vérifie si le formulaire a été soumis
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $nom_fichier = SeedDB::uploadImage($_FILES['image']);
+    $nom_fichier = Form::uploadImage($_FILES['image']);
 
     $seed = new Seed;
     $seed->load(
@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $seedDB->addSeed($seed);
 
     if ($result) {
-        header("Location: " . REL_PATH . "list_seeds.php");
+        header("Location: " . PUBLIC_PATH . "list_seeds.php");
         exit();
     } else {
         echo "Erreur : Impossible d'ajouter la graine.";

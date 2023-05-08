@@ -21,20 +21,35 @@ class SeedRenderer
     public static function renderSeed(Seed $seed): void
     {
         // Récupérations des données de la graine et vérifications
-        if ($seed == null) return;
+        if ($seed === null) {
+            return;
+        }
 
-        $planting_period = $seed->getPlantingPeriod() != null ? $seed->getPlantingPeriod() : "Non renseigné";
-        $harvest_period = $seed->getHarvestPeriod() != null ? $seed->getHarvestPeriod() : "Non renseigné";
-        $advices = $seed->getAdvices() != null ? $seed->getAdvices() : "Non renseigné";
-        $image = $seed->getImage() != null ? $seed->getImage() : null;
-        $quantity = $seed->getQuantity() != null ? $seed->getQuantity() : "Non renseigné";
+        $planting_period_min = $seed->getPlantingPeriodMin() !== null ? $seed->getPlantingPeriodMin() : -1;
+        $planting_period_max = $seed->getPlantingPeriodMax() !== null ? $seed->getPlantingPeriodMax() : -1;
+        $harvest_period_min = $seed->getHarvestPeriodMin() !== null ? $seed->getHarvestPeriodMin() : -1;
+        $harvest_period_max = $seed->getHarvestPeriodMax() !== null ? $seed->getHarvestPeriodMax() : -1;
+
+        $advices = $seed->getAdvices() !== null ? $seed->getAdvices() : "Non renseigné";
+        $image = $seed->getImage() !== null ? $seed->getImage() : null;
+        $quantity = $seed->getQuantity() !== null ? $seed->getQuantity() : "Non renseigné";
+
+        $planting_period = "Non renseigné";
+        if ($planting_period_min !== "Non renseigné" && $planting_period_max !== "Non renseigné") {
+            $planting_period = "Entre " . Calendar::getMonth($planting_period_min) . " et " . Calendar::getMonth($planting_period_max);
+        }
+
+        $harvest_period = "Non renseigné";
+        if ($harvest_period_min !== "Non renseigné" && $harvest_period_max !== "Non renseigné") {
+            $harvest_period = "Entre " . Calendar::getMonth($harvest_period_min) . " et " . Calendar::getMonth($harvest_period_max);
+        }
     ?>
         <div class="seed">
             <h2 class="name"><?= $seed->getName() ?></h2>
             <p class="family light_text"><?= $seed->getFamily() ?></p>
             <p class="planting-period"><span class="bold">Période de plantation : </span> <?= $planting_period ?></p>
             <p class="harvest-period"><span class="bold">Période de récolte : </span> <?= $harvest_period ?></p>
-            <?php if ($image != null) : ?>
+            <?php if ($image !== null) : ?>
                 <img class="image" src="<?= SEEDS_ASSETS_PATH . $image ?>" alt="<?= $seed->getName() ?>">
             <?php endif; ?>
             <p class="advices"><span class="bold">Conseils : </span><?= $advices ?></p>

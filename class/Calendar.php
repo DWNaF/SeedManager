@@ -21,4 +21,10 @@ class Calendar
         11 => "Novembre",
         12 => "Décembre"
     ];
+
+    public static function getMonth(int $month): string
+    {
+        if ($month == -1) return "Non renseigné";
+        return self::MONTHS[$month];
+    }
 }

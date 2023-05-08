@@ -5,50 +5,54 @@ require_once dirname(__DIR__) . '/config/config.php';
 class SeedDB
 {
     // Attribut(s)
-    private static ?PDO $bd = null;
+    private ?PDO $db = null;
 
-    public static function connect()
+    /**
+     * Constructeur de la classe SeedDB qui permet de se connecter à la base de données
+     */
+    public function __construct()
     {
         Database::log();
-        self::$bd = Database::getDB();
+        $this->db = Database::getDB();
     }
 
-    public static function isConnected(): bool
+    /**
+     * Vérifie si la base de données est bien connectée
+     * @return bool true si la base de données est connectée, false sinon
+     */
+    public function isConnected(): bool
     {
-        return self::$bd != null;
+        return $this->db !== null;
     }
+
 
     /**
      * Récupère toutes les graines de la base de données
      * @return array|null Tableau contenant toutes les graines de la base de données sous forme d'instances de Seed
      */
-    public static function getAllSeeds(): ?array
+    public function getAllSeeds(): ?array
     {
-        if (!self::isConnected()) {
-            self::connect();
-        };
+        if (!$this->isConnected()) return null;
 
         // Construction de la requête SQL
         $sql = "SELECT * FROM seeds";
 
         // Exécution de la requête SQL
-        $statement = self::$bd->prepare($sql);
-        if (!($statement->execute())) return null;
+        $statement = $this->db->query($sql);
         $seeds = $statement->fetchAll(PDO::FETCH_CLASS, "Seed");
 
         return $seeds;
     }
+
 
     /**
      * Récupère toutes les graines de la base de données filtrées selon les critères spécifiés
      * @param array|null $filters Tableau associatif contenant les critères de filtres et leurs valeurs
      * @return array|null Tableau contenant toutes les graines de la base de données filtrées sous forme d'instances de Seed
      */
-    public static function getFilteredSeeds(?array $filters): ?array
+    public function getFilteredSeeds(?array $filters): ?array
     {
-        if (!self::isConnected()) {
-            self::connect();
-        };
+        if (!$this->isConnected()) return null;
 
         // Construction de la requête SQL
         $sql = "SELECT * FROM seeds WHERE 1=1";
@@ -56,38 +60,19 @@ class SeedDB
 
         if ($filters) {
             if (isset($filters['name'])) {
-                $sql .= " AND name LIKE ?";
+                $sql .= " AND seeds_name LIKE ?";
                 $params[] = '%' . $filters['name'] . '%';
             }
             if (isset($filters['family'])) {
-                $sql .= " AND family LIKE ?";
+                $sql .= " AND family_id IN (SELECT family_id FROM families WHERE family_name LIKE ?)";
                 $params[] = '%' . $filters['family'] . '%';
             }
-            if (isset($filters['planting_period'])) {
-                $sql .= " AND planting_period = ?";
-                $params[] = $filters['planting_period'];
-            }
-            if (isset($filters['harvest_period'])) {
-                $sql .= " AND harvest_period = ?";
-                $params[] = $filters['harvest_period'];
-            }
-            if (isset($filters['advices'])) {
-                $sql .= " AND advices LIKE ?";
-                $params[] = '%' . $filters['advices'] . '%';
-            }
-            if (isset($filters['image'])) {
-                $sql .= " AND image LIKE ?";
-                $params[] = '%' . $filters['image'] . '%';
-            }
-            if (isset($filters['quantity'])) {
-                $sql .= " AND quantity = ?";
-                $params[] = $filters['quantity'];
-            }
+            // Ajoutez d'autres conditions de filtre si nécessaire
         }
 
         // Exécution de la requête SQL
-        $statement = self::$bd->prepare($sql);
-        if (!($statement->execute($params))) return null;
+        $statement = $this->db->prepare($sql);
+        $statement->execute($params);
         $seeds = $statement->fetchAll(PDO::FETCH_CLASS, "Seed");
 
         return $seeds;
@@ -96,13 +81,13 @@ class SeedDB
     /**
      * Récupère toutes les familles de graines de la base de données
      */
-    public static function getAllFamilies(): ?array
+    public function getAllFamilies(): ?array
     {
         Database::log();
         $database = Database::getDB();
 
         if ($database == null) return null;
-        $statement = $database->prepare("SELECT DISTINCT family FROM seeds");
+        $statement = $database->prepare("SELECT DISTINCT family_name FROM families");
         if (!($statement->execute())) return null;
         $families = $statement->fetchAll(PDO::FETCH_COLUMN);
 
@@ -116,7 +101,7 @@ class SeedDB
      * @param int $id L'identifiant de la graine à récupérer
      * @return Seed|null La graine récupérée, null si la graine n'existe pas
      */
-    public static function getSeed(int $id): ?Seed
+    public function getSeed(int $id): ?Seed
     {
         Database::log();
         $database = Database::getDB();
@@ -135,15 +120,26 @@ class SeedDB
      * @param Seed $seed La graine à ajouter
      * @return bool True si l'ajout s'est bien déroulé, False sinon
      */
-    public static function addSeed(Seed $seed): bool
+    public function addSeed(Seed $seed): bool
     {
-        if (!self::isConnected()) {
-            self::connect();
-        };
+        if (!$this->isConnected()) return false;
 
-        $statement = self::$bd->prepare("INSERT INTO seeds (name, family, planting_period, harvest_period, image, advices, quantity) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $result = $statement->execute([$seed->getName(), $seed->getFamily(), $seed->getPlantingPeriod(), $seed->getHarvestPeriod(), $seed->getImage(), $seed->getAdvices(), $seed->getQuantity()]);
-        return $result;
+        $query = "INSERT INTO seeds (seeds_name, family_id, planting_period_min, planting_period_max, harvest_period_min, harvest_period_max, advices, image, quantity) VALUES (:name, :family_id, :planting_period_min, :planting_period_max, :harvest_period_min, :harvest_period_max, :advices, :image, :quantity)";
+        $params = array(
+            ':name' => $seed->getName(),
+            ':family_id' => SeedDB::getFamilyId($seed->getFamily()),
+            ':planting_period_min' => $seed->getPlantingPeriodMin(),
+            ':planting_period_max' => $seed->getPlantingPeriodMax(),
+            ':harvest_period_min' => $seed->getHarvestPeriodMin(),
+            ':harvest_period_max' => $seed->getHarvestPeriodMax(),
+            ':advices' => $seed->getAdvices(),
+            ':image' => $seed->getImage(),
+            ':quantity' => $seed->getQuantity()
+        );
+
+        $result = Database::query($query, $params);
+
+        return ($result !== null);
     }
 
     /**
@@ -151,15 +147,16 @@ class SeedDB
      * @param int $id L'identifiant de la graine à supprimer
      * @return bool True si la suppression s'est bien déroulée, False sinon
      */
-    public static function deleteSeed(int $id): bool
+    public function deleteSeed(int $id): bool
     {
-        if (!self::isConnected()) {
-            self::connect();
-        };
+        if (!$this->isConnected()) return false;
 
-        $statement = self::$bd->prepare("DELETE FROM seeds WHERE id = ?");
-        $result = $statement->execute([$id]);
-        return $result;
+        $query = "DELETE FROM seeds WHERE id = :id";
+        $params = array(':id' => $id);
+
+        $result = Database::query($query, $params);
+
+        return ($result !== null);
     }
 
     /**
@@ -168,16 +165,52 @@ class SeedDB
      * @param int $newQuantity Nouvelle quantité de la graine
      * @return bool True si la mise à jour a été effectuée avec succès, false sinon
      */
-    public static function updateSeedQuantity(int $id, int $newQuantity): bool
+    public function updateSeedQuantity(int $id, int $newQuantity): bool
     {
-        if (!self::isConnected()) {
-            self::connect();
-        };
+        if (!$this->isConnected()) return false;
 
-        $statement = self::$bd->prepare("UPDATE seeds SET quantity = :quantity WHERE id = :id");
-        $statement->bindValue(':quantity', $newQuantity, PDO::PARAM_INT);
-        $statement->bindValue(':id', $id, PDO::PARAM_INT);
+        $query = "UPDATE seeds SET quantity = :quantity WHERE id = :id";
+        $params = array(':quantity' => $newQuantity, ':id' => $id);
 
-        return $statement->execute();
+        $result = Database::query($query, $params);
+
+        return ($result !== null);
+    }
+
+
+    /**
+     * Récupère l'identifiant d'une famille de graines à partir de son nom si elle existe
+     * @param string $family_name Nom de la famille de graines
+     * @return int|null L'identifiant de la famille de graines, null si elle n'existe pas
+     */
+    public static function getFamilyId($family_name) : int|null {
+        Database::log();
+        $database = Database::getDB();
+
+        if ($database == null) return null;
+        $statement = $database->prepare("SELECT family_id FROM families WHERE family_name = ?");
+        if (!($statement->execute([$family_name]))) return null;
+        $family_id = $statement->fetchColumn();
+
+        Database::disconnect();
+        return $family_id;
+    }
+
+    /**
+     * Récupère le nom d'une famille de graines à partir de son identifiant si elle existe
+     * @param int $family_id Identifiant de la famille de graines
+     * @return string|null Le nom de la famille de graines, null si elle n'existe pas
+     */
+    public static function getFamilyName($family_id) : string|null {
+        Database::log();
+        $database = Database::getDB();
+
+        if ($database == null) return null;
+        $statement = $database->prepare("SELECT family_name FROM families WHERE family_id = ?");
+        if (!($statement->execute([$family_id]))) return null;
+        $family_name = $statement->fetchColumn();
+
+        Database::disconnect();
+        return $family_name;
     }
 }

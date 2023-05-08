@@ -14,11 +14,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nom_fichier = Form::uploadImage($_FILES['image']);
 
     $seed = new Seed;
-    $seed->load(
+    $seed = $seed::new(
         $_POST["name"],
         $_POST["family"],
-        $_POST["planting_period"],
-        $_POST["harvest_period"],
+        $_POST["planting_period_min"],
+        $_POST["planting_period_max"],
+        $_POST["harvest_period_min"],
+        $_POST["harvest_period_max"],
         $_POST["advices"],
         $nom_fichier,
         $_POST["quantity"]

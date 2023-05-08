@@ -4,6 +4,14 @@ require_once dirname(__DIR__) . '/config/config.php';
 
 class Form
 {
+    private static SeedDB $seedDB;
+
+    public static function init(): void
+    {
+        if (!isset(self::$seedDB)){
+            self::$seedDB = new SeedDB();
+        }
+    }
 
     /**
      * Génère le formulaire de filtrage
@@ -11,7 +19,7 @@ class Form
      */
     public static function renderFilterForm(?array $filters): void
     {
-        $all_families = SeedDB::getAllFamilies();
+        $all_families = self::$seedDB->getAllFamilies();
 
         $selected_family = isset($filters['family']) ?  $filters['family'] : 'Toutes';
         $planting_min = isset($filters['planting_min']) ?  $filters['planting_min'] : 1;
@@ -102,7 +110,7 @@ class Form
     public static function renderSeedForm(?Seed $seed): void
     {
         if (!empty($seed)) {
-            $all_families = SeedDB::getAllFamilies();
+            $all_families = self::$seedDB->getAllFamilies();
 
             $name = isset($seed['name']) ?  $seed['name'] : "";
             $family = isset($seed['family']) ?  $seed['family'] : "";

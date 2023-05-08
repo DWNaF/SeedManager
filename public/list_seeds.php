@@ -3,6 +3,8 @@
 require_once '../config/config.php';
 
 ob_start();
+Form::init();
+$seedDB = new SeedDB();
 ?>
 <section id="main_content">
 
@@ -17,9 +19,9 @@ ob_start();
 
 
     if (isset($filters) && $filters != null) {
-        $seeds = SeedDB::getFilteredSeeds($filters);
+        $seeds = $seedDB->getFilteredSeeds($filters);
     } else {
-        $seeds = SeedDB::getAllSeeds();
+        $seeds = $seedDB->getAllSeeds();
     }
 
     SeedRenderer::renderAll($seeds);

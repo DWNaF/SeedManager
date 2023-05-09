@@ -18,9 +18,18 @@ class Database
             try {
                 self::$bd = new PDO("mysql:host=" . $config['host'] . ";dbname=" . $config['dbname'], $config['user'], $config['password']);
             } catch (PDOException $e) {
-                return;
+                new Exceptions\DBConnectException($e->getMessage());
             }
         }
+    }
+
+    /**
+     * Vérifie si la base de données est connectée
+     * @return bool true si la base de données est connectée, false sinon
+     */
+    public static function isConnected(): bool
+    {
+        return self::$bd !== null;
     }
 
     /**
@@ -30,8 +39,8 @@ class Database
      */
     public static function query(string $query, array $params = []): ?PDOStatement
     {
-        self::log();
-        if (self::$bd === null) return null;
+        if (!self::isConnected()) self::log();
+
         $req = self::$bd->prepare($query);
         $req->execute($params);
         return $req;

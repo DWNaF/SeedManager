@@ -13,7 +13,7 @@ nav{
     align-items: center;
     justify-content: center;
 
-    height: 70px;
+    height: var(--navbar-height);
     width: 100%;
 
     background-color: var(--color-navbar-background);

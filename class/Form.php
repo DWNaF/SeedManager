@@ -8,7 +8,7 @@ class Form
 
     public static function init(): void
     {
-        if (!isset(self::$seedDB)){
+        if (!isset(self::$seedDB)) {
             self::$seedDB = new SeedDB();
         }
     }
@@ -99,7 +99,7 @@ class Form
                 <button type="reset" form="filters_container" onclick="<?php unset($_GET["filters"]) ?>">Réinitialiser</button>
             </div>
             <?php if (isset($_SESSION["logged"]) && $_SESSION["logged"]) { ?>
-                <a id="add_seed_btn" href="addSeed.php">Ajouter une graine</a>
+                <a id="add_seed_btn" href="admin.php">Ajouter une graine</a>
             <?php } ?>
         </form>
 
@@ -107,50 +107,70 @@ class Form
     }
 
 
-    public static function renderSeedForm(?Seed $seed): void
+    public static function renderSeedForm(Seed $seed = null): void
     {
         if (!empty($seed)) {
-            $all_families = self::$seedDB->getAllFamilies();
-
-            $name = isset($seed['name']) ?  $seed['name'] : "";
-            $family = isset($seed['family']) ?  $seed['family'] : "";
-            $planting_min = isset($seed['planting_min']) ?  $seed['planting_min'] : 1;
-            $planting_max = isset($seed['planting_max']) ?  $seed['planting_max'] : 12;
-
-            $harvest_min = isset($seed['harvest_min']) ?  $seed['harvest_min'] : 1;
-            $harvest_max = isset($seed['harvest_max']) ?  $seed['harvest_max'] : 12;
-
-            $quantity = isset($seed['quantity']) ?  $seed['quantity'] : 0;
-            $image = isset($seed['image']) ?  $seed['image'] : "";
-            $description = isset($seed['description']) ?  $seed['description'] : "";
-            $id = isset($seed['id']) ?  $seed['id'] : "";
+            $name = $seed->getName();
+            $familyName = $seed->getFamily();
+            $planting_period_min = $seed->getPlantingPeriodMin();
+            $planting_period_max = $seed->getPlantingPeriodMax();
+            $harvest_period_min = $seed->getHarvestPeriodMin();
+            $harvest_period_max = $seed->getHarvestPeriodMax();
+            $advices = $seed->getAdvices();
+            $quantity = $seed->getQuantity();
+        } else {
+            $name = "";
+            $familyName = "";
+            $planting_period_min = 0;
+            $planting_period_max = 12;
+            $harvest_period_min = 0;
+            $harvest_period_max = 12;
+            $advices = "";
+            $quantity = 0;
         }
 
     ?>
-
         <main>
             <h1>Ajout d'une graine</h1>
             <form action="<?= HANDLERS_PATH ?>addseed.php" method="POST" enctype="multipart/form-data">
                 <label for="name">Nom :</label>
-                <input type="text" id="name" name="name" required>
+                <input type="text" id="name" name="name" value="<?= $name ?>" required>
 
                 <label for="family">Famille :</label>
-                <input type="text" id="family" name="family" required>
+                <input list="families" type="text" id="family" name="family" value="<?= $familyName ?>" required>
+                <datalist id="families">
+                    <?php
+                    $families = SeedDB::getAllFamilies();
+                    foreach ($families as $family) {
+                        echo "<option value=\"" . $family . "\">";
+                    }
+                    ?>
+                </datalist>
 
-                <label for="planting_period">Période de plantation :</label>
-                <input type="text" id="planting_period" name="planting_period" required>
+                <label>Période de plantation</label>
+                <div id="planting_perdiod_container">
+                    <label for="planting_period_min">entre :</label>
+                    <input type="number" id="planting_period_min" name="planting_period_min" min="1" max="12" value="<?= $planting_period_min ?>" required>
+                    <label for="planting_period_max">et :</label>
+                    <input type="number" id="planting_period_max" name="planting_period_max" min="1" max="12" value="<?= $planting_period_max ?>" required>
+                </div>
 
-                <label for="harvest_period">Période de récolte :</label>
-                <input type="text" id="harvest_period" name="harvest_period" required>
+                <label for="harvest_period">Période de récolte</label>
+                <div id="harvest_period_container">
+                    <label for="harvest_period_min">entre :</label>
+                    <input type="number" id="harvest_period_min" name="harvest_period_min" min="1" max="12" value="<?= $harvest_period_min ?>" required>
+                    <label for="harvest_period_max">et :</label>
+                    <input type="number" id="harvest_period_max" name="harvest_period_max" min="1" max="12" value="<?= $harvest_period_max ?>" required>
+                </div>
 
                 <label for="advices">Conseils de culture :</label>
-                <textarea id="advices" name="advices"></textarea>
+                <textarea id="advices" name="advices"><?= $advices ?></textarea>
 
                 <label for="image">Image :</label>
                 <input type="file" id="image" name="image">
 
                 <label for="quantity">Quantité :</label>
-                <input type="number" id="quantity" name="quantity" required>
+                <input type="number" id="quantity" name="quantity" min="0" value="<?= $quantity ?>" required>
 
                 <input type="submit" name="submit" value="Ajouter la graine">
             </form>

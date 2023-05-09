@@ -48,7 +48,6 @@ class Template
             ?>
 
             <?php include INCLUDES_PATH . 'footer.html'; ?>
-
             <script src="<?= JS_PATH ?>main.js"></script>
             <?php if (file_exists(JS_PATH_INCL . $page . '.js')) echo "<script src='" . JS_PATH . $page . ".js'></script>"; ?>
         </body>

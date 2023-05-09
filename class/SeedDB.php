@@ -4,42 +4,22 @@ require_once dirname(__DIR__) . '/config/config.php';
 
 class SeedDB
 {
-    // Attribut(s)
-    private ?PDO $db = null;
-
-    /**
-     * Constructeur de la classe SeedDB qui permet de se connecter à la base de données
-     */
-    public function __construct()
-    {
-        Database::log();
-        $this->db = Database::getDB();
-    }
-
-    /**
-     * Vérifie si la base de données est bien connectée
-     * @return bool true si la base de données est connectée, false sinon
-     */
-    public function isConnected(): bool
-    {
-        return $this->db !== null;
-    }
-
 
     /**
      * Récupère toutes les graines de la base de données
      * @return array|null Tableau contenant toutes les graines de la base de données sous forme d'instances de Seed
      */
-    public function getAllSeeds(): ?array
+    public static function getAllSeeds(): ?array
     {
-        if (!$this->isConnected()) return null;
+        if (!Database::isConnected()) {
+            Database::log(); // Se connecte à la base de données si ce n'est pas déjà fait
+        }
 
         // Construction de la requête SQL
-        $sql = "SELECT * FROM seeds";
+        $query = "SELECT * FROM seeds";
+        $query = Database::query($query);
 
-        // Exécution de la requête SQL
-        $statement = $this->db->query($sql);
-        $seeds = $statement->fetchAll(PDO::FETCH_CLASS, "Seed");
+        $seeds = $query->fetchAll(PDO::FETCH_CLASS, "Seed");
 
         return $seeds;
     }
@@ -50,9 +30,11 @@ class SeedDB
      * @param array|null $filters Tableau associatif contenant les critères de filtres et leurs valeurs
      * @return array|null Tableau contenant toutes les graines de la base de données filtrées sous forme d'instances de Seed
      */
-    public function getFilteredSeeds(?array $filters): ?array
+    public static function getFilteredSeeds(?array $filters): ?array
     {
-        if (!$this->isConnected()) return null;
+        if (!Database::isConnected()) {
+            Database::log(); // Se connecte à la base de données si ce n'est pas déjà fait
+        }
 
         // Construction de la requête SQL
         $sql = "SELECT * FROM seeds WHERE 1=1";
@@ -67,32 +49,29 @@ class SeedDB
                 $sql .= " AND family_id IN (SELECT family_id FROM families WHERE family_name LIKE ?)";
                 $params[] = '%' . $filters['family'] . '%';
             }
-            // Ajoutez d'autres conditions de filtre si nécessaire
         }
 
         // Exécution de la requête SQL
-        $statement = $this->db->prepare($sql);
-        $statement->execute($params);
-        $seeds = $statement->fetchAll(PDO::FETCH_CLASS, "Seed");
+        $result = Database::query($sql, $params);
+        $result = $result->fetchAll(PDO::FETCH_CLASS, "Seed");
 
-        return $seeds;
+        return $result;
     }
 
     /**
      * Récupère toutes les familles de graines de la base de données
      */
-    public function getAllFamilies(): ?array
+    public static function getAllFamilies(): ?array
     {
-        Database::log();
-        $database = Database::getDB();
+        if (!Database::isConnected()) {
+            Database::log(); // Se connecte à la base de données si ce n'est pas déjà fait
+        }
 
-        if ($database == null) return null;
-        $statement = $database->prepare("SELECT DISTINCT family_name FROM families");
-        if (!($statement->execute())) return null;
-        $families = $statement->fetchAll(PDO::FETCH_COLUMN);
+        $sql = "SELECT DISTINCT family_name FROM families";
+        $result = Database::query($sql);
+        $result = $result->fetchAll(PDO::FETCH_COLUMN);
 
-        Database::disconnect();
-        return $families;
+        return $result;
     }
 
 
@@ -101,18 +80,18 @@ class SeedDB
      * @param int $id L'identifiant de la graine à récupérer
      * @return Seed|null La graine récupérée, null si la graine n'existe pas
      */
-    public function getSeed(int $id): ?Seed
+    public static function getSeed(int $id): ?Seed
     {
-        Database::log();
-        $database = Database::getDB();
+        if (!Database::isConnected()) {
+            Database::log(); // Se connecte à la base de données si ce n'est pas déjà fait
+        }
 
-        if ($database == null) return null;
-        $statement = $database->prepare("SELECT * FROM seeds WHERE id = ?");
-        if (!($statement->execute([$id]))) return null;
-        $seed = $statement->fetchObject("Seed");
+        $sql = "SELECT * FROM seeds WHERE seed_id = ?";
+        $params = array($id);
+        $result = Database::query($sql, $params);
+        $result = $result->fetchObject("Seed");
 
-        Database::disconnect();
-        return $seed;
+        return ($result !== false) ? $result : null;
     }
 
     /**
@@ -120,11 +99,13 @@ class SeedDB
      * @param Seed $seed La graine à ajouter
      * @return bool True si l'ajout s'est bien déroulé, False sinon
      */
-    public function addSeed(Seed $seed): bool
+    public static function addSeed(Seed $seed): bool
     {
-        if (!$this->isConnected()) return false;
+        if (!Database::isConnected()) {
+            Database::log(); // Se connecte à la base de données si ce n'est pas déjà fait
+        }
 
-        $query = "INSERT INTO seeds (seeds_name, family_id, planting_period_min, planting_period_max, harvest_period_min, harvest_period_max, advices, image, quantity) VALUES (:name, :family_id, :planting_period_min, :planting_period_max, :harvest_period_min, :harvest_period_max, :advices, :image, :quantity)";
+        $query = "INSERT INTO seeds (seed_name, family_id, planting_period_min, planting_period_max, harvest_period_min, harvest_period_max, advices, image, quantity) VALUES (:name, :family_id, :planting_period_min, :planting_period_max, :harvest_period_min, :harvest_period_max, :advices, :image, :quantity)";
         $params = array(
             ':name' => $seed->getName(),
             ':family_id' => SeedDB::getFamilyId($seed->getFamily()),
@@ -149,7 +130,9 @@ class SeedDB
      */
     public function deleteSeed(int $id): bool
     {
-        if (!$this->isConnected()) return false;
+        if (!Database::isConnected()) {
+            Database::log(); // Se connecte à la base de données si ce n'est pas déjà fait
+        }
 
         $query = "DELETE FROM seeds WHERE id = :id";
         $params = array(':id' => $id);
@@ -167,7 +150,9 @@ class SeedDB
      */
     public function updateSeedQuantity(int $id, int $newQuantity): bool
     {
-        if (!$this->isConnected()) return false;
+        if (!Database::isConnected()) {
+            Database::log(); // Se connecte à la base de données si ce n'est pas déjà fait
+        }
 
         $query = "UPDATE seeds SET quantity = :quantity WHERE id = :id";
         $params = array(':quantity' => $newQuantity, ':id' => $id);
@@ -183,17 +168,18 @@ class SeedDB
      * @param string $family_name Nom de la famille de graines
      * @return int|null L'identifiant de la famille de graines, null si elle n'existe pas
      */
-    public static function getFamilyId($family_name) : int|null {
-        Database::log();
-        $database = Database::getDB();
+    public static function getFamilyId($family_name): int|null
+    {
+        if (!Database::isConnected()) {
+            Database::log(); // Se connecte à la base de données si ce n'est pas déjà fait
+        }
 
-        if ($database == null) return null;
-        $statement = $database->prepare("SELECT family_id FROM families WHERE family_name = ?");
-        if (!($statement->execute([$family_name]))) return null;
-        $family_id = $statement->fetchColumn();
+        $sql = "SELECT family_id FROM families WHERE family_name = ?";
+        $params = array($family_name);
+        $result = Database::query($sql, $params);
+        $result = $result->fetchColumn();
 
-        Database::disconnect();
-        return $family_id;
+        return $result->fetchColumn();
     }
 
     /**
@@ -201,16 +187,36 @@ class SeedDB
      * @param int $family_id Identifiant de la famille de graines
      * @return string|null Le nom de la famille de graines, null si elle n'existe pas
      */
-    public static function getFamilyName($family_id) : string|null {
-        Database::log();
-        $database = Database::getDB();
+    public static function getFamilyName($family_id): string|null
+    {
+        if (!Database::isConnected()) {
+            Database::log(); // Se connecte à la base de données si ce n'est pas déjà fait
+        }
 
-        if ($database == null) return null;
-        $statement = $database->prepare("SELECT family_name FROM families WHERE family_id = ?");
-        if (!($statement->execute([$family_id]))) return null;
-        $family_name = $statement->fetchColumn();
+        $sql = "SELECT family_name FROM families WHERE family_id = ?";
+        $params = array($family_id);
+        $result = Database::query($sql, $params);
+        $result = $result->fetchColumn();
 
-        Database::disconnect();
-        return $family_name;
+        return $result;
+    }
+
+    /**
+     * Ajoute une nouvelle famille de graines dans la base de données
+     * @param string $family_name Nom de la famille de graines à ajouter
+     * @return bool True si l'ajout s'est bien déroulé, False sinon
+     */
+    public function addFamily($family_name): bool
+    {
+        if (!Database::isConnected()) {
+            Database::log(); // Se connecte à la base de données si ce n'est pas déjà fait
+        }
+
+        $query = "INSERT INTO families (family_name) VALUES (:family_name)";
+        $params = array(':family_name' => $family_name);
+
+        $result = Database::query($query, $params);
+
+        return ($result !== null);
     }
 }

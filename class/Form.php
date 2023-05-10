@@ -19,6 +19,7 @@ class Form
      */
     public static function renderFilterForm(?array $filters): void
     {
+        self::init();
         $all_families = self::$seedDB->getAllFamilies();
 
         $selected_family = isset($filters['family']) ?  $filters['family'] : 'Toutes';

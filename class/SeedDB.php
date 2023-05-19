@@ -42,7 +42,7 @@ class SeedDB
 
         if ($filters) {
             if (isset($filters['name'])) {
-                $sql .= " AND seeds_name LIKE ?";
+                $sql .= " AND seed_name LIKE ?";
                 $params[] = '%' . $filters['name'] . '%';
             }
             if (isset($filters['family'])) {
@@ -80,12 +80,16 @@ class SeedDB
      * @param int $id L'identifiant de la graine à récupérer
      * @return Seed|null La graine récupérée, null si la graine n'existe pas
      */
-    public static function getSeed(int $id): ?Seed
+    public static function getSeed(?int $id): ?Seed
     {
         if (!Database::isConnected()) {
             Database::log(); // Se connecte à la base de données si ce n'est pas déjà fait
         }
 
+        if ($id === null) {
+            return null;
+        }
+        
         $sql = "SELECT * FROM seeds WHERE seed_id = ?";
         $params = array($id);
         $result = Database::query($sql, $params);
@@ -134,7 +138,7 @@ class SeedDB
             Database::log(); // Se connecte à la base de données si ce n'est pas déjà fait
         }
 
-        $query = "DELETE FROM seeds WHERE id = :id";
+        $query = "DELETE FROM seeds WHERE seed_id = :id";
         $params = array(':id' => $id);
 
         $result = Database::query($query, $params);
@@ -154,7 +158,7 @@ class SeedDB
             Database::log(); // Se connecte à la base de données si ce n'est pas déjà fait
         }
 
-        $query = "UPDATE seeds SET quantity = :quantity WHERE id = :id";
+        $query = "UPDATE seeds SET quantity = :quantity WHERE seed_id = :id";
         $params = array(':quantity' => $newQuantity, ':id' => $id);
 
         $result = Database::query($query, $params);

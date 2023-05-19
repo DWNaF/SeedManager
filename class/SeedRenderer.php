@@ -57,7 +57,7 @@ class SeedRenderer
             <?php if (isset($_SESSION["logged"]) && $_SESSION["logged"]) { ?>
                 <div class="actions">
                     <a class="admin_buttons" href="<?= PUBLIC_PATH ?>admin.php?id=<?= $seed->getId() ?>">Modifier</a>
-                    <a class="admin_buttons" href="<?= HANDLERS_PATH ?>deleteseed.php?id=<?= $seed->getId() ?>">Supprimer</a>
+                    <a class="delete_seed_btn admin_buttons" href="<?= HANDLERS_PATH ?>deleteseed.php?id=<?= $seed->getId() ?>">Supprimer</a>
                 </div>
             <?php } ?>
         </div>

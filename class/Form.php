@@ -35,8 +35,13 @@ class Form
         $searchQuery = isset($filters['name']) ?  $filters['name'] : "";
 ?>
         <form id="filters_container" method="GET" action="">
-            <div class="filters">
+            <div id="search_container">
+                <label for="search">Recherche :</label>
+                <input id="search" type="text" name="filters[name]" value="<?= $searchQuery ?>">
+                <button type="submit"></button>
+            </div>
 
+            <div id="filters">
                 <div class="filter_container">
                     <label for="family">Famille :</label>
                     <select id="family" name="filters[family]">
@@ -83,20 +88,15 @@ class Form
                             </option>
                         <?php endforeach; ?>
                     </select>
-
+                    
                 </div>
-
+                
                 <div class="filter_container">
                     <label for="quantity_min"><span class="bold">Stock<span> entre </label>
                     <input id="quantity_min" type="number" name="filters[quantity_min]" value="<?= $quantity_min ?>">
                     <label for="quantity_max"> et </label>
                     <input id="quantity_max" type="number" name="filters[quantity_max]" value="<?= $quantity_max ?>">
                 </div>
-
-
-                <label for="search">Recherche :</label>
-                <input id="search" type="text" name="filters[name]" value="<?= $searchQuery ?>">
-                <button type="submit">Filtrer</button>
                 <button type="reset" form="filters_container" onclick="<?php unset($_GET["filters"]) ?>">Réinitialiser</button>
             </div>
             <?php if (isset($_SESSION["logged"]) && $_SESSION["logged"]) { ?>

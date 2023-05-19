@@ -5,6 +5,8 @@
     width: 100%;
 }
 
+/* ########################## Barre de recherche ########################## */
+
 #filters_container{
     position: relative;
     margin: 30px 0;
@@ -12,6 +14,38 @@
     display: flex;
     justify-content: center;
 }
+
+button[type="submit"]{
+    height: 100%;
+    width: 40px;
+    background-image: url("assets/logos/search.png");
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-color: transparent;
+
+    border: none;
+}
+
+#filters{
+    display: none;
+}
+
+
+
+#add_seed_btn{
+    background-color: var(--color-seeds-container-background);
+    color: var(--color-paragraphs) ;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    border-radius: 4px;
+    padding: 10px;
+}
+
+/* ########################## Contenu principal ########################## */
 
 #seeds_container{
     border-radius: 4px;
@@ -35,17 +69,6 @@
     background-color: var(--color-seeds-container-background);
 }
 
-#add_seed_btn{
-    background-color: var(--color-seeds-container-background);
-    color: var(--color-paragraphs) ;
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-
-    border-radius: 4px;
-    padding: 10px;
-}
 
 .light_text{
     color: var(--color-ligth-text);

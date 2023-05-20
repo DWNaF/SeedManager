@@ -183,7 +183,7 @@ class SeedDB
         $result = Database::query($sql, $params);
         $result = $result->fetchColumn();
 
-        return $result->fetchColumn();
+        return $result;
     }
 
     /**

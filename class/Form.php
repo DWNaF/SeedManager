@@ -35,9 +35,12 @@ class Form
         $searchQuery = isset($filters['name']) ?  $filters['name'] : "";
 ?>
         <form id="filters_container" method="GET" action="">
+            <?php if (isset($_SESSION["logged"]) && $_SESSION["logged"]) { ?>
+                <a id="add_seed_btn" href="admin.php">New Seed</a>
+            <?php } ?>
+
             <div id="search_container">
-                <label for="search">Recherche :</label>
-                <input id="search" type="text" name="filters[name]" value="<?= $searchQuery ?>">
+                <input id="search_input" type="text" name="filters[name]" placeholder="Rechercher une graine ..." value="<?= $searchQuery ?>">
                 <button type="submit"></button>
             </div>
 
@@ -88,9 +91,9 @@ class Form
                             </option>
                         <?php endforeach; ?>
                     </select>
-                    
+
                 </div>
-                
+
                 <div class="filter_container">
                     <label for="quantity_min"><span class="bold">Stock<span> entre </label>
                     <input id="quantity_min" type="number" name="filters[quantity_min]" value="<?= $quantity_min ?>">
@@ -99,9 +102,7 @@ class Form
                 </div>
                 <button type="reset" form="filters_container" onclick="<?php unset($_GET["filters"]) ?>">Réinitialiser</button>
             </div>
-            <?php if (isset($_SESSION["logged"]) && $_SESSION["logged"]) { ?>
-                <a id="add_seed_btn" href="admin.php">Ajouter une graine</a>
-            <?php } ?>
+
         </form>
 
     <?php
@@ -133,7 +134,7 @@ class Form
     ?>
         <main>
             <h1>Ajout d'une graine</h1>
-            <form action="<?= HANDLERS_PATH ?>addseed.php" method="POST" enctype="multipart/form-data">
+            <form action="<?= HANDLERS_PATH . (empty($seed) ? 'addseed' : 'editseed') . '.php' ?>" method="POST" enctype="multipart/form-data">
                 <label for="name">Nom :</label>
                 <input type="text" id="name" name="name" value="<?= $name ?>" required>
 

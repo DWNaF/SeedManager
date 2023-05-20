@@ -18,7 +18,20 @@ class SeedRenderer
     <?php
     }
 
-    public static function renderSeed(Seed $seed): void
+
+    public static function renderSeed(?Seed $seed): void
+    {
+        if ($seed === null) return;
+        $image = $seed->getImage() !== null ? $seed->getImage(): "unavailable.png";
+    ?>
+    <div class="seed">
+        <img class="seed_image" src="<?= SEEDS_ASSETS_PATH . $image ?>" alt="<?= $seed->getName() ?>">
+        <a class="seed_name_container" href="<?= PUBLIC_PATH . "seed.php?id=" . $seed->getId()?>"><?= $seed->getName() ?></a>
+    </div>
+    <?php
+    }
+
+    public static function renderUniqueSeed(Seed $seed): void
     {
         // Récupérations des données de la graine et vérifications
         if ($seed === null) {

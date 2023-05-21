@@ -89,7 +89,7 @@ class SeedDB
         if ($id === null) {
             return null;
         }
-        
+
         $sql = "SELECT * FROM seeds WHERE seed_id = ?";
         $params = array($id);
         $result = Database::query($sql, $params);
@@ -222,5 +222,54 @@ class SeedDB
         $result = Database::query($query, $params);
 
         return ($result !== null);
+    }
+
+    public function updateSeed($seed_id, $seed_name, $family_id, $planting_period_min, $planting_period_max, $harvest_period_min, $harvest_period_max, $advices, $image, $quantity): bool
+    {
+        $query = "UPDATE seeds set ";
+        if ($seed_name != null && !empty($seed_name)) {
+            $query .= "seed_name = :seed_name, ";
+            $params[':seed_name'] = $seed_name;
+        }
+        if ($family_id != null && !empty($family_id)) {
+            $query .= "family_id = :family_id, ";
+            $params[':family_id'] = $family_id;
+        }
+        if ($planting_period_min != null && !empty($planting_period_min)) {
+            $query .= "planting_period_min = :planting_period_min, ";
+            $params[':planting_period_min'] = $planting_period_min;
+        }
+        if ($planting_period_max != null && !empty($planting_period_max)) {
+            $query .= "planting_period_max = :planting_period_max, ";
+            $params[':planting_period_max'] = $planting_period_max;
+        }
+        if ($harvest_period_min != null && !empty($harvest_period_min)) {
+            $query .= "harvest_period_min = :harvest_period_min, ";
+            $params[':harvest_period_min'] = $harvest_period_min;
+        }
+        if ($harvest_period_max != null && !empty($harvest_period_max)) {
+            $query .= "harvest_period_max = :harvest_period_max, ";
+            $params[':harvest_period_max'] = $harvest_period_max;
+        }
+        if ($advices != null && !empty($advices)) {
+            $query .= "advices = :advices, ";
+            $params[':advices'] = $advices;
+        }
+        if ($image != null && !empty($image)) {
+            $query .= "image = :image, ";
+            $params[':image'] = $image;
+        }
+        if ($quantity != null && !empty($quantity)) {
+            $query .= "quantity = :quantity, ";
+            $params[':quantity'] = $quantity;
+        }
+        // $query = substr($query, 0, -2);
+        $query .= " WHERE seed_id = :seed_id;";
+        $params[':seed_id'] = $seed_id;
+
+        $result = Database::query($query, $params);
+        if ($result !== null) {
+            return true;
+        } else return false;
     }
 }

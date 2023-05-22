@@ -17,8 +17,9 @@
     --color-navbar-background: var(--primary-color);
     --color-navbar-text: #FFFFFF;
 
-    --color-seeds-container-background: #E2DCCB ;
-    --color-seeds-container-border: #E2DCCB ;
+    --color-seeds-container-background: rgba(0, 0, 0, 0.1);
+    --color-seeds-container-background-text: rgba(0, 0, 0, 0.5);
+    --color-seeds-container-background-text-hover: rgba(0, 0, 0, 0.8);
 }
 
 * {

@@ -4,7 +4,7 @@ require_once '../config/config.php';
 
 // On vérifie que l'utilisateur est connecté et qu'il a bien accès à cette page
 if (!isset($_SESSION["logged"]) || $_SESSION["logged"] == false) {
-    header("Location: " . REL_PATH . "error");
+    header("Location: " . PUBLIC_PATH . "list_seeds.php");
     exit();
 }
 

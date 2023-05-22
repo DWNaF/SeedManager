@@ -210,7 +210,7 @@ class SeedDB
      * @param string $family_name Nom de la famille de graines à ajouter
      * @return bool True si l'ajout s'est bien déroulé, False sinon
      */
-    public function addFamily($family_name): bool
+    public static function addFamily($family_name): bool
     {
         if (!Database::isConnected()) {
             Database::log(); // Se connecte à la base de données si ce n'est pas déjà fait
@@ -224,52 +224,88 @@ class SeedDB
         return ($result !== null);
     }
 
-    public function updateSeed($seed_id, $seed_name, $family_id, $planting_period_min, $planting_period_max, $harvest_period_min, $harvest_period_max, $advices, $image, $quantity): bool
+    /**
+     * Mets à jour une graine dans la base de données
+     * @param int $seed_id Identifiant de la graine à mettre à jour
+     * @param string|null $seed_name Nom de la graine
+     * @param int|null $family_id Identifiant de la famille de la graine
+     * @param int|null $planting_period_min Période de plantation minimale de la graine
+     * @param int|null $planting_period_max Période de plantation maximale de la graine
+     * @param int|null $harvest_period_min Période de récolte minimale de la graine
+     * @param int|null $harvest_period_max Période de récolte maximale de la graine
+     * @param string|null $advices Conseils pour la graine
+     * @param string|null $image Chemin de l'image de la graine
+     * @param int|null $quantity Quantité de la graine
+     * @return bool True si la mise à jour s'est bien déroulée, False sinon
+     */
+    public static function updateSeed($seed_id, $seed_name, $family_id, $planting_period_min, $planting_period_max, $harvest_period_min, $harvest_period_max, $advices, $image, $quantity): bool
     {
-        $query = "UPDATE seeds set ";
+        $query = "UPDATE seeds SET ";
+        $params = [];
+
         if ($seed_name != null && !empty($seed_name)) {
             $query .= "seed_name = :seed_name, ";
             $params[':seed_name'] = $seed_name;
         }
+
         if ($family_id != null && !empty($family_id)) {
             $query .= "family_id = :family_id, ";
             $params[':family_id'] = $family_id;
         }
+
         if ($planting_period_min != null && !empty($planting_period_min)) {
             $query .= "planting_period_min = :planting_period_min, ";
             $params[':planting_period_min'] = $planting_period_min;
         }
+
         if ($planting_period_max != null && !empty($planting_period_max)) {
             $query .= "planting_period_max = :planting_period_max, ";
             $params[':planting_period_max'] = $planting_period_max;
         }
+
         if ($harvest_period_min != null && !empty($harvest_period_min)) {
             $query .= "harvest_period_min = :harvest_period_min, ";
             $params[':harvest_period_min'] = $harvest_period_min;
         }
+
         if ($harvest_period_max != null && !empty($harvest_period_max)) {
             $query .= "harvest_period_max = :harvest_period_max, ";
             $params[':harvest_period_max'] = $harvest_period_max;
         }
+
         if ($advices != null && !empty($advices)) {
             $query .= "advices = :advices, ";
             $params[':advices'] = $advices;
         }
+
         if ($image != null && !empty($image)) {
             $query .= "image = :image, ";
             $params[':image'] = $image;
         }
+
         if ($quantity != null && !empty($quantity)) {
             $query .= "quantity = :quantity, ";
             $params[':quantity'] = $quantity;
         }
-        // $query = substr($query, 0, -2);
-        $query .= " WHERE seed_id = :seed_id;";
+
+        $query = rtrim($query, ', ');
+        $query .= " WHERE seed_id = :seed_id";
         $params[':seed_id'] = $seed_id;
 
         $result = Database::query($query, $params);
-        if ($result !== null) {
-            return true;
-        } else return false;
+
+        return $result !== null;
+    }
+
+    /**
+     * Récupère toutes les images utilisées pour les graines
+     * @return array|null Les images utilisées pour les graines
+     */
+    public static function getSeedsImages(): array|null
+    {
+        $query = "SELECT DISTINCT image FROM seeds";
+        $result = Database::query($query);
+
+        return $result->fetchAll();
     }
 }

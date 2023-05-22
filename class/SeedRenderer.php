@@ -22,18 +22,24 @@ class SeedRenderer
     public static function renderSeed(?Seed $seed): void
     {
         if ($seed === null) return;
-        $image = $seed->getImage() !== null ? $seed->getImage(): "unavailable.png";
+        $image = $seed->getImage() !== null && file_exists(SEEDS_ASSETS_PATH_FULL . $seed->getImage()) ? $seed->getImage() : "unavailable.png";
     ?>
-    <div class="seed">
-        <img class="seed_image" src="<?= SEEDS_ASSETS_PATH . $image ?>" alt="<?= $seed->getName() ?>">
-        <a class="seed_name_container" href="<?= PUBLIC_PATH . "seed.php?id=" . $seed->getId()?>"><?= $seed->getName() ?></a>
-    </div>
+        <div class="seed">
+            <img class="seed_image" src="<?= SEEDS_ASSETS_PATH . $image ?>" alt="<?= $seed->getName() ?>">
+            <a class="seed_name_container" href="<?= PUBLIC_PATH . "seed.php?id=" . $seed->getId() ?>"><?= $seed->getName() ?></a>
+            <?php if (isset($_SESSION["logged"]) && $_SESSION["logged"]) { ?>
+                <div id="admin_buttons_container">
+                    <a id="edit_btn" class="admin_buttons" href="<?= PUBLIC_PATH ?>admin.php?id=<?= $seed->getId() ?>"></a>
+                    <a class="admin_buttons delete_seed_btn" href="<?= HANDLERS_PATH ?>deleteseed.php?id=<?= $seed->getId() ?>"></a>
+                </div>
+            <?php } ?>
+
+        </div>
     <?php
     }
-
     public static function renderUniqueSeed(Seed $seed): void
     {
-        // Récupérations des données de la graine et vérifications
+        // Récupération des données de la graine et vérifications
         if ($seed === null) {
             return;
         }
@@ -48,25 +54,26 @@ class SeedRenderer
         $quantity = $seed->getQuantity() !== null ? $seed->getQuantity() : "Non renseigné";
 
         $planting_period = "Non renseigné";
-        if ($planting_period_min !== "Non renseigné" && $planting_period_max !== "Non renseigné") {
+        if ($planting_period_min !== -1 && $planting_period_max !== -1) {
             $planting_period = "Entre " . Calendar::getMonth($planting_period_min) . " et " . Calendar::getMonth($planting_period_max);
         }
 
         $harvest_period = "Non renseigné";
-        if ($harvest_period_min !== "Non renseigné" && $harvest_period_max !== "Non renseigné") {
+        if ($harvest_period_min !== -1 && $harvest_period_max !== -1) {
             $harvest_period = "Entre " . Calendar::getMonth($harvest_period_min) . " et " . Calendar::getMonth($harvest_period_max);
         }
     ?>
         <div class="seed">
+            <a class="back" href="<?= PUBLIC_PATH ?>list_seeds.php">Retour</a>
             <h2 class="name"><?= $seed->getName() ?></h2>
             <p class="family light_text"><?= $seed->getFamily() ?></p>
-            <p class="planting-period"><span class="bold">Période de plantation : </span> <?= $planting_period ?></p>
-            <p class="harvest-period"><span class="bold">Période de récolte : </span> <?= $harvest_period ?></p>
+            <p class="planting-period"><strong>Période de plantation : </strong><?= $planting_period ?></p>
+            <p class="harvest-period"><strong>Période de récolte : </strong><?= $harvest_period ?></p>
             <?php if ($image !== null) : ?>
                 <img class="image" src="<?= SEEDS_ASSETS_PATH . $image ?>" alt="<?= $seed->getName() ?>">
             <?php endif; ?>
-            <p class="advices"><span class="bold">Conseils : </span><?= $advices ?></p>
-            <p class="quantity"><span class="bold">Stock : </span><?= $quantity ?></p>
+            <p class="advices"><strong>Conseils : </strong><?= $advices ?></p>
+            <p class="quantity"><strong>Stock : </strong><?= $quantity ?>g</p>
             <?php if (isset($_SESSION["logged"]) && $_SESSION["logged"]) { ?>
                 <div class="actions">
                     <a class="admin_buttons" href="<?= PUBLIC_PATH ?>admin.php?id=<?= $seed->getId() ?>">Modifier</a>

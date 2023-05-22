@@ -72,3 +72,13 @@ select{
   color: red;
   margin-bottom: 1rem;
 }
+
+#image_preview, #new_image_preview{
+    width: 100%;
+    height: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+
+    max-width: 500px;
+    max-height: 500px;
+}

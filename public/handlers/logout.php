@@ -2,8 +2,10 @@
 
 require_once '../../config/config.php';
 
-session_start();
+if (session_status() != PHP_SESSION_ACTIVE) session_start();
 session_destroy();
 
-header("Location: " . PUBLIC_PATH . "home.php");
+Admin::deleteUnusedImages();
+
+header("Location: " . PUBLIC_PATH . "list_seeds.php");
 exit();

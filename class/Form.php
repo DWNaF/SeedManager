@@ -34,17 +34,23 @@ class Form
 
         $searchQuery = isset($filters['name']) ?  $filters['name'] : "";
 ?>
-        <form id="filters_container" method="GET" action="">
+        <form id="simple_filter_form" class="filter_form" method="GET" action="">
             <?php if (isset($_SESSION["logged"]) && $_SESSION["logged"]) { ?>
                 <a id="add_seed_btn" href="admin.php">New Seed</a>
             <?php } ?>
-
             <div id="search_container">
                 <input id="search_input" type="text" name="filters[name]" placeholder="Rechercher une graine ..." value="<?= $searchQuery ?>">
-                <button type="submit"></button>
+                <button id="submit_simple_search" type="submit" form="simple_filter_form"></button>
             </div>
+        </form>
 
-            <div id="filters">
+        <form id="advanced_filter_form" class="filter_form" method="GET" action="">
+            <button id="show_filters" type="button">Recherche avancée +</button>
+            <dialog class="hidden filters" id="modal">
+                <div class="filter_container">
+                    <label for="search_input">Recherche :</label>
+                    <input type="text" name="filters[name]" placeholder="Rechercher une graine ..." value="<?= $searchQuery ?>">
+                </div>
                 <div class="filter_container">
                     <label for="family">Famille :</label>
                     <select id="family" name="filters[family]">
@@ -56,7 +62,7 @@ class Form
                 </div>
 
                 <div class="filter_container">
-                    <label for="planting_min"><span class="bold">Période de plantation entre <span></label>
+                    <label for="planting_min">Période de plantation entre</label>
                     <select id="planting_min" name="filters[planting_min]">
                         <?php foreach (Calendar::MONTHS as $key => $month) : ?>
                             <option value="<?= $key ?>" <?= $key == $planting_min ? 'selected' : '' ?>>
@@ -75,7 +81,7 @@ class Form
                 </div>
 
                 <div class="filter_container">
-                    <label for="harvest_min"><span class="bold">Période de récolte entre <span></label>
+                    <label for="harvest_min">Période de récolte entre</label>
                     <select id="harvest_min" name="filters[harvest_min]">
                         <?php foreach (Calendar::MONTHS as $key => $month) : ?>
                             <option value="<?= $key ?>" <?= $key == $harvest_min ? 'selected' : '' ?>>
@@ -83,7 +89,7 @@ class Form
                             </option>
                         <?php endforeach; ?>
                     </select>
-                    <label for="harvest_max"> et </label>
+                    <label for="harvest_max">et</label>
                     <select id="harvest_max" name="filters[harvest_max]">
                         <?php foreach (Calendar::MONTHS as $key => $month) : ?>
                             <option value="<?= $key ?>" <?= $key == $harvest_max ? 'selected' : '' ?>>
@@ -95,23 +101,28 @@ class Form
                 </div>
 
                 <div class="filter_container">
-                    <label for="quantity_min"><span class="bold">Stock<span> entre </label>
-                    <input id="quantity_min" type="number" name="filters[quantity_min]" value="<?= $quantity_min ?>">
+                    <label for="quantity_min">Stock entre</label>
+                    <input id="quantity_min" type="number" min=0 name="filters[quantity_min]" value="<?= $quantity_min ?>">
                     <label for="quantity_max"> et </label>
-                    <input id="quantity_max" type="number" name="filters[quantity_max]" value="<?= $quantity_max ?>">
+                    <input id="quantity_max" type="number" min=0 name="filters[quantity_max]" value="<?= $quantity_max ?>">
                 </div>
-                <button type="reset" form="filters_container" onclick="<?php unset($_GET["filters"]) ?>">Réinitialiser</button>
-            </div>
+                <button type="reset" form="advanced_filter_form" onclick="resetFilters()">Réinitialiser</button>
+                <script>
+                    function resetFilters() {
+                        window.location.href = window.location.pathname;
+                    }
+                </script>
+
+            </dialog>
 
         </form>
-
     <?php
     }
-
 
     public static function renderSeedForm(Seed $seed = null): void
     {
         if (!empty($seed)) {
+            $id = $seed->getId();
             $name = $seed->getName();
             $familyName = $seed->getFamily();
             $planting_period_min = $seed->getPlantingPeriodMin();
@@ -120,7 +131,9 @@ class Form
             $harvest_period_max = $seed->getHarvestPeriodMax();
             $advices = $seed->getAdvices();
             $quantity = $seed->getQuantity();
+            $image = $seed->getImage();
         } else {
+            $id = -1;
             $name = "";
             $familyName = "";
             $planting_period_min = 0;
@@ -129,18 +142,25 @@ class Form
             $harvest_period_max = 12;
             $advices = "";
             $quantity = 0;
+            $image = null;
         }
 
     ?>
         <main>
-            <h1>Ajout d'une graine</h1>
+            <?php
+            if (!empty($seed)) {
+                echo "<h1>Modification de la graine : " . $seed->getName() . "</h1>";
+            } else {
+                echo "<h1>Ajout d'une graine</h1>";
+            }
+            ?>
             <form action="<?= HANDLERS_PATH . (empty($seed) ? 'addseed' : 'editseed') . '.php' ?>" method="POST" enctype="multipart/form-data">
                 <label for="name">Nom :</label>
                 <input type="text" id="name" name="name" value="<?= $name ?>" required>
 
                 <label for="family">Famille :</label>
                 <input list="families" type="text" id="family" name="family" value="<?= $familyName ?>" required>
-                <datalist id="families">
+                <datalist id="families" aria-autocomplete="off">
                     <?php
                     $families = SeedDB::getAllFamilies();
                     foreach ($families as $family) {
@@ -169,12 +189,19 @@ class Form
                 <textarea id="advices" name="advices"><?= $advices ?></textarea>
 
                 <label for="image">Image :</label>
+                <?php if (!empty($image)) { ?>
+                    <img id="image_preview" src="<?= SEEDS_ASSETS_PATH . $image ?>" alt="Image de la graine">
+                <?php } ?>
                 <input type="file" id="image" name="image">
+                <?php if (empty($image)) { ?>
+                    <img id="new_image_preview">
+                <?php } ?>
 
                 <label for="quantity">Quantité :</label>
                 <input type="number" id="quantity" name="quantity" min="0" value="<?= $quantity ?>" required>
 
-                <input type="submit" name="submit" value="Ajouter la graine">
+                <input type="hidden" name="id" value="<?= $id ?>">
+                <input type="submit" name="submit" value="<?= !empty($seed) ? "Modifier la graine" : "Ajouter la graine" ?>">
             </form>
         </main>
 

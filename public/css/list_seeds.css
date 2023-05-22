@@ -7,18 +7,32 @@
 
 /* ########################## Barre de recherche ########################## */
 
-#filters_container {
+
+
+.filter_form{
   position: relative;
-  margin: 50px 0;
+  /* margin: 50px 0; */
   width: 100%;
+
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: end;
+  gap: 5px;
+
+  margin-right: 70px;
+
+}
+
+#simple_filter_form {
+  margin-top: 50px;
+  margin-bottom: 5px;
+}
+
+#advanced_filter_form{
+  margin-bottom: 50px;
 }
 
 #search_container {
-  position: absolute;
-  right: 70px;
-
   display: flex;
   align-items: center;
 
@@ -42,7 +56,7 @@
   outline: none;
 }
 
-button[type="submit"] {
+#submit_simple_search {
   height: 100%;
   width: 10%;
   background-image: url("assets/logos/search.png");
@@ -56,11 +70,72 @@ button[type="submit"] {
   margin: 0 5px;
 }
 
-button[type="submit"]:hover {
+#submit_simple_search:hover {
   cursor: pointer;
 }
 
-#filters {
+#show_filters{
+  color: var(--primary-color);
+
+  background-color: transparent;
+  border: none;
+} 
+
+#show_filters:hover{
+  cursor: pointer;
+}
+
+
+
+.filters {
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  border: none;
+  border-radius: 8px;
+  padding: 20px;
+
+  background-color: rgba(255,255, 255, 0.9);
+  min-width: 600px;
+
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+}
+
+.filters::backdrop {
+  backdrop-filter: blur(2px);
+}
+
+#close-modal{
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  background-color: rgba(255, 0, 0, 0.6);
+  color: white;
+  font-size: 2rem;
+
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+}
+
+#close-modal:hover{
+  cursor: pointer;
+  background-color: rgba(255, 0, 0, 0.9);
+}
+
+.hidden{
   display: none;
 }
 
@@ -87,6 +162,24 @@ button[type="submit"]:hover {
   background-color: var(--third-color);
 }
 
+.filter_container{
+  display: flex;
+  gap: 10px;
+
+  margin-bottom: 5px;
+}
+
+.filter_container label {
+  font-weight: bold;
+}
+
+.filter_container * {
+  outline: none;
+}
+
+
+
+
 /* ########################## Contenu principal ########################## */
 
 #seeds_container {
@@ -109,7 +202,7 @@ button[type="submit"]:hover {
   border-radius: 140px 140px 12px 12px;
 
   overflow: hidden;
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: var(--color-seeds-container-background);
 
   display: flex;
   align-items: center;
@@ -128,7 +221,7 @@ button[type="submit"]:hover {
   width: 100%;
   height: 30%;
 
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--color-seeds-container-background-text);
 
   display: flex;
   align-items: center;
@@ -140,32 +233,48 @@ button[type="submit"]:hover {
 }
 
 .seed_name_container:hover {
-  background-color: rgba(0, 0, 0, 0.8);
-}
-
-/* .seed{
-    color: var(--color-paragraphs);
-    width: 300px;
-    height: 270px;
-    border-radius: 6px;
-    padding: 10px;
-
-    background-color: var(--color-seeds-container-background);
+  background-color: var(--color-seeds-container-background-text-hover);
 }
 
 
-.light_text{
-    color: var(--color-ligth-text);
-    font-weight: lighter;
-}
+#admin_buttons_container{
+  position: absolute;
+  top: 0;
+  height: 70%;
+  width: 100%;
 
-.bold{
-    font-weight: bold;
+  display: flex;
 }
 
 .admin_buttons{
-    border-radius: 4px;
-    background-color: var(--color-navbar-background);
-    margin: 5px;
-    padding: 0 5px;
-} */
+  position: absolute;
+  height: 100%;
+  width: 50%;
+  background-color: var(--color-seeds-container-background-text);
+  border-bottom: 2px solid white;
+
+  background-position: center;
+  background-size: 40%;
+  background-repeat: no-repeat;
+  background-position-y: 60%;
+} 
+
+#edit_btn{
+  left: 0;
+  border-right: 2px solid white;
+  background-image: url("assets/logos/edit.png");
+}
+
+#edit_btn:hover{
+  background-color: rgba(0, 0, 255, 0.7);
+}
+
+.delete_seed_btn{
+  right: 0;
+  background-image: url(assets/logos/trash.png);
+}
+
+.delete_seed_btn:hover{
+  background-color: rgba(255, 0, 0, 0.7);
+}
+

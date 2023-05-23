@@ -20,6 +20,10 @@ class Calendar
         12 => "Décembre"
     ];
 
+    public static function getMonth(int $month){
+        return self::MONTHS[$month];
+    }
+
     public function __construct($date = null)
     {
         $this->active_year = $date != null ? date('Y', strtotime($date)) : date('Y');

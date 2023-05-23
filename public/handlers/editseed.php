@@ -23,7 +23,7 @@ $harvest_period_max = $_POST["harvest_period_max"];
 $advices = $_POST["advices"];
 $image = $_FILES["image"] ?? null;
 if ($image != null) $nom_fichier = Form::uploadImage($image);
-else $nom_fichier = null;
+else $nom_fichier = "unavailable.png";
 
 $quantity = $_POST["quantity"];
 

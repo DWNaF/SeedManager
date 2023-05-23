@@ -18,6 +18,7 @@ main {
 
 main > h1 {
     text-align: center;
+    color: var(--color-paragraphs);
 }
 
 form {
@@ -30,6 +31,7 @@ form {
 }
 
 label {
+  color: var(--color-paragraphs);
   font-weight: bold;
   margin-bottom: 0.5rem;
 }
@@ -44,6 +46,16 @@ textarea, input[type="number"] {
 
   resize: vertical;
 }
+
+input[type="number"]{
+  max-width: 20%;
+  appearance: none;
+  -moz-appearance: textfield;
+  -webkit-appearance: textfield;
+  
+}
+
+
 
 
 input[type="submit"] {
@@ -61,6 +73,7 @@ input[type="submit"]:hover {
 }
 
 input[type="file"]{
+    color: var(--color-paragraphs);
     margin-bottom: 15px;
 }
 

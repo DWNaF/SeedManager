@@ -49,7 +49,36 @@ class SeedDB
                 $sql .= " AND family_id IN (SELECT family_id FROM families WHERE family_name LIKE ?)";
                 $params[] = '%' . $filters['family'] . '%';
             }
+            if (isset($filters['planting_min'])) {
+                $sql .= " AND planting_period_min >= ?";
+                $params[] = $filters['planting_min'];
+            }
+            if (isset($filters['planting_max'])) {
+                $sql .= " AND planting_period_max <= ?";
+                $params[] = $filters['planting_max'];
+            }
+            if (isset($filters['harvest_min'])) {
+                $sql .= " AND harvest_period_min >= ?";
+                $params[] = $filters['harvest_min'];
+            }
+            if (isset($filters['harvest_max'])) {
+                $sql .= " AND harvest_period_max <= ?";
+                $params[] = $filters['harvest_max'];
+            }
+            if (isset($filters['advices'])) {
+                $sql .= " AND advices LIKE ?";
+                $params[] = '%' . $filters['advices'] . '%';
+            }
+            if (isset($filters['quantity_min'])) {
+                $sql .= " AND quantity >= ?";
+                $params[] = $filters['quantity_min'];
+            }
+            if (isset($filters['quantity_max'])) {
+                $sql .= " AND quantity <= ?";
+                $params[] = $filters['quantity_max'];
+            }
         }
+        $sql = rtrim($sql, ', ');
 
         // Exécution de la requête SQL
         $result = Database::query($sql, $params);

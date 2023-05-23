@@ -106,12 +106,15 @@ class Form
                     <label for="quantity_max"> et </label>
                     <input id="quantity_max" type="number" min=0 name="filters[quantity_max]" value="<?= $quantity_max ?>">
                 </div>
-                <button type="reset" form="advanced_filter_form" onclick="resetFilters()">Réinitialiser</button>
-                <script>
-                    function resetFilters() {
-                        window.location.href = window.location.pathname;
-                    }
-                </script>
+
+                <div class="modal_btns_container">
+                    <button type="reset" form="advanced_filter_form" onclick="resetFilters()">Réinitialiser</button>
+                    <script>
+                        function resetFilters() {
+                            window.location.href = window.location.pathname;
+                        }
+                    </script>
+                </div>
 
             </dialog>
 
@@ -197,8 +200,8 @@ class Form
                     <img id="new_image_preview">
                 <?php } ?>
 
-                <label for="quantity">Quantité :</label>
-                <input type="number" id="quantity" name="quantity" min="0" value="<?= $quantity ?>" required>
+                <label for="quantity">Quantité (g) :</label>
+                <input type="number" id="quantity" name="quantity" min="0" value="<?= $quantity?>" required>
 
                 <input type="hidden" name="id" value="<?= $id ?>">
                 <input type="submit" name="submit" value="<?= !empty($seed) ? "Modifier la graine" : "Ajouter la graine" ?>">
@@ -217,6 +220,9 @@ class Form
      */
     public static function uploadImage($image): ?string
     {
+        if ($image['error'] != 0) {
+            return null;
+        }
         $dossier_cible = SEEDS_ASSETS_PATH_FULL;
         $nom_fichier = $image['name'];
         $chemin_fichier = $dossier_cible . $nom_fichier;

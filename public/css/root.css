@@ -55,6 +55,36 @@ body{
     background-color: rgba(255,0,0,0.55);
 }
 
+.warning{
+    position: absolute;
+    top: 30%;
+
+    width: 100%;
+    text-align: center;
+
+    padding: 10px 0;
+    color: var(--color-paragraphs);
+}
+
+.warning button{
+    margin-top: 10px;
+    padding: 5px 10px;
+
+    border-radius: 5px;
+    border: none;
+
+    background-color: var(--primary-color);
+    color: var(--color-paragraphs);
+
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.warning button:hover{
+    background-color: var(--secondary-color);
+}
+
 .active_link{
     border-bottom: 1px solid var(--color-navbar-text);
 }

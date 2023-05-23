@@ -60,6 +60,8 @@
   color: #fff;
   text-decoration: none;
   margin-right: 10px;
+
+  border-radius: 6px;
 }
 
 .delete_seed_btn {

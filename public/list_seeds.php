@@ -24,7 +24,21 @@ $seedDB = new SeedDB();
         $seeds = $seedDB->getAllSeeds();
     }
 
-    SeedRenderer::renderAll($seeds);
+    if ($seeds != null && !empty($seeds)) {
+        SeedRenderer::renderAll($seeds);
+    } else {
+    ?>
+        <div class="warning" role="alert">
+            <h3>Aucune graine ne correspond à votre recherche.</h3>
+            <button type="reset" onclick="resetFilters()">Réinitialiser les filtres</button>
+            <script>
+                function resetFilters() {
+                    window.location.href = window.location.pathname;
+                }
+            </script>
+        </div>
+    <?php
+    }
     ?>
 </section>
 <?php

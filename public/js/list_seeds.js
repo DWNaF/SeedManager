@@ -1,13 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    delete_seeds_btns = document.querySelectorAll('.delete_seed_btn');
-    delete_seeds_btns.forEach(btn => {
-      btn.addEventListener('click', (event) => {
-        if (!confirm('Are you sure you want to delete this seed?')) {
-          event.preventDefault();
-          return;
-        }
-      });
-    });
 
     advanced_search_btn = document.querySelector('#show_filters');
 
@@ -56,9 +47,10 @@ document.addEventListener('DOMContentLoaded', () => {
             validBtn.type = "submit";
             validBtn.form = "advanced_filter_form";
             validBtn.id = "valid-modal";
+            validBtn.classList.add('modal_btns');
 
             modal.appendChild(closeBtn);
-            modal.appendChild(validBtn);
+            modal.querySelector(".modal_btns_container").appendChild(validBtn);
         }
     }
 })
